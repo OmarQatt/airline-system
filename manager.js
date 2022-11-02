@@ -18,7 +18,7 @@ require("./system.js");
     , 10000);
    
     events.on('jordan', (payload) => {
-        console.log(`EVENT new flight ${payload.flightID} to ${payload.destination} has been added`);
+        // console.log(`EVENT new flight ${payload.flightID} to ${payload.destination} has been added`);
         events.emit('NewFlight', payload);
     }
     );
