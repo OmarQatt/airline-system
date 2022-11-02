@@ -1,23 +1,27 @@
 'use strict';
 
-const events = require('./events.js');
+const io = require("socket.io-client");
 
-require("./manager.js");
-require("./system.js");
+const airlineSocket = io.connect("http://localhost:4000/airline");
+const socket = io("http://localhost:4000");
 
-events.on('NewFlight', (payload) => {
-    // console.log(`pilot new flight ${payload.flightID} to ${payload.destination} has been added`);
+// socket.on('NewFlight', (Details) => {
+//     console.log(`manager new flight ${Details.flightID} to ${Details.destination} has been added`);
+//     console.log('flight', { event: 'NewFlight', time: new Date(), Details });
+// }
+// );
+
+socket.on('NewFlight', (Details) => {
     setTimeout(() => {
-        console.log(`pilot with id ${payload.flightID} to destination ${payload.destination} took off`);
-        events.emit('tookoff', payload);
+        console.log(`pilot with id ${Details.flightID} to destination ${Details.destination} takeoff`);
+        airlineSocket.emit('takeoff', Details);
     }, 4000);
 
     setTimeout(() => {
-        console.log(`pilot with id ${payload.flightID} to ${payload.destination} has been arrived`);
-        events.emit('Arrived', payload);
+        console.log(`pilot with id ${Details.flightID} to ${Details.destination} has been arrived`);
+        airlineSocket.emit('Arrived', Details);
     }, 7000);
-}
-);
+});
 
 
 

@@ -1,25 +1,55 @@
-'use strict';
+"use strict";
 
-const events = require('./events.js');
+const io = require("socket.io")(4000);
 
-require('./manager.js');
-require('./pilot.js');
 
-events.on('NewFlight', (payload) => {
-    console.log(`manager new flight ${payload.flightID} to ${payload.destination} has been added`);
-    console.log('flight', { event: 'NewFlight', time: new Date(), payload });
-}
-);
 
-events.on('tookoff', (payload) => {
-    // console.log(`manager flight with id ${payload.flightID} to destination ${payload.destination} took off`);
-    console.log('flight', { event: 'tookoff', time: new Date(), payload });
-}
-);
+io.on("connection", (socket) => {
+  socket.on("NewFlight", (Details) => {
+    io.emit("NewFlight", Details);
+    console.log(`Flight {
+        event: 'NewFlight',
+        time: ${new Date()},
+        Details: {
+            airLine: ${Details.airline},
+            flightID: ${Details.flightID},
+            pilot: ${Details.pilotName},
+            destination: ${Details.destination}
+        }
+    }`);
+  });
+});
 
-events.on('Arrived', (payload) => {
-    console.log('flight', { event: 'Arrived', time: new Date(), payload });
-    console.log(`manager flight with id ${payload.flightID} to ${payload.destination} has been arrived`);
-}
-);
 
+const airlineIO = io.of("/airline");
+airlineIO.on("connection", (socket) => {
+  socket.on("takeoff", (Details) => {
+    console.log(`Flight {
+        event: 'takeoff',
+        time: ${new Date()},
+        Details: {
+            airLine: ${Details.airline},
+            flightID: ${Details.flightID},
+            pilot: ${Details.pilotName},
+            destination: ${Details.destination}
+        }
+    }`);
+  });
+});
+
+airlineIO.on("connection", (socket) => {
+    socket.on("Arrived", (Details) => {
+      io.emit("Arrived", Details);
+      console.log(`Flight {
+          event: 'Arrived',
+          time: ${new Date()},
+          Details: {
+              airLine: ${Details.airline},
+              flightID: ${Details.flightID},
+              pilot: ${Details.pilotName},
+              destination: ${Details.destination}
+          }
+      }`);
+    });
+  });
+  
